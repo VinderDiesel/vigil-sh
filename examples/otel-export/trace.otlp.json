@@ -1,0 +1,69 @@
+{
+  "resourceSpans": [
+    {
+      "scopeSpans": [
+        {
+          "spans": [
+            {
+              "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+              "spanId": "00f067aa0ba902b7",
+              "parentSpanId": null,
+              "name": "support-agent run",
+              "startTimeUnixNano": "1754035200000000000",
+              "attributes": [{"key": "session.id", "value": {"stringValue": "s-1"}}],
+              "status": {"code": 1}
+            },
+            {
+              "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+              "spanId": "00f067aa0ba902b8",
+              "parentSpanId": "00f067aa0ba902b7",
+              "name": "chat gpt-4o-mini",
+              "startTimeUnixNano": "1754035200100000000",
+              "attributes": [
+                {"key": "gen_ai.request.model", "value": {"stringValue": "gpt-4o-mini"}},
+                {"key": "gen_ai.usage.prompt_tokens", "value": {"intValue": "312"}},
+                {"key": "gen_ai.usage.completion_tokens", "value": {"intValue": "64"}}
+              ],
+              "status": {"code": 1}
+            },
+            {
+              "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+              "spanId": "00f067aa0ba902b9",
+              "parentSpanId": "00f067aa0ba902b7",
+              "name": "search_kb",
+              "startTimeUnixNano": "1754035200200000000",
+              "attributes": [
+                {"key": "gen_ai.tool.name", "value": {"stringValue": "search_kb"}},
+                {"key": "tool.arguments", "value": {"stringValue": "{\"q\":\"refund\"}"}}
+              ],
+              "status": {"code": 1}
+            },
+            {
+              "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+              "spanId": "00f067aa0ba902ba",
+              "parentSpanId": "00f067aa0ba902b7",
+              "name": "issue_refund",
+              "startTimeUnixNano": "1754035200300000000",
+              "attributes": [
+                {"key": "gen_ai.tool.name", "value": {"stringValue": "issue_refund"}},
+                {"key": "tool.arguments", "value": {"stringValue": "{\"amount\":120}"}}
+              ],
+              "status": {"code": 2, "message": "refund over policy limit"}
+            },
+            {
+              "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+              "spanId": "00f067aa0ba902bb",
+              "parentSpanId": "00f067aa0ba902b7",
+              "name": "escalate_to_human",
+              "startTimeUnixNano": "1754035200400000000",
+              "attributes": [
+                {"key": "handoff.reason", "value": {"stringValue": "refund over limit"}}
+              ],
+              "status": {"code": 1}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

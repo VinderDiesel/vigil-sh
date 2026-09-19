@@ -1,0 +1,6 @@
+{"event_id":"e1","run_id":"run-a","parent_id":null,"seq":0,"ts":"2026-09-01T10:00:00Z","kind":"run.start","name":"support-agent","payload":{"session":"s-1","user_email":"alice@example.com"},"effect_class":"read"}
+{"event_id":"e2","run_id":"run-a","parent_id":"e1","seq":1,"ts":"2026-09-01T10:00:01Z","kind":"tool.call","name":"search_kb","payload":{"tool":"search_kb","arguments":{"q":"refund"},"api_key":"sk-abcdefghijklmnop123456"},"effect_class":"read"}
+{"event_id":"e3","run_id":"run-a","parent_id":"e1","seq":2,"ts":"2026-09-01T10:00:02Z","kind":"error","name":"tool_error","payload":{"error_type":"timeout","error":"kb timeout after 30s"},"effect_class":"read"}
+{"event_id":"e4","run_id":"run-b","parent_id":null,"seq":0,"ts":"2026-09-01T10:05:00Z","kind":"run.start","name":"support-agent","payload":{"session":"s-2"},"effect_class":"read"}
+{"event_id":"e5","run_id":"run-b","parent_id":"e4","seq":1,"ts":"2026-09-01T10:05:01Z","kind":"tool.call","name":"issue_refund","payload":{"tool":"issue_refund","arguments":{"amount":120}},"effect_class":"destructive"}
+{"event_id":"e6","run_id":"run-b","parent_id":"e4","seq":2,"ts":"2026-09-01T10:05:02Z","kind":"human.handoff","name":"escalate","payload":{"reason":"refund over limit"},"effect_class":"read"}

@@ -1,0 +1,13 @@
+{
+  "case_id": "case:shipping-window",
+  "spec_version": "v1alpha1",
+  "title": "customer asks how long shipping takes",
+  "input": {"question": "shipping-window"},
+  "oracle": {"regex": "[3-5] business days"},
+  "oracle_version": "v1",
+  "replay_mode": "mock-replay",
+  "severity": "medium",
+  "labels": ["domain:support"],
+  "confidence": 1.0,
+  "provenance": {"collector": "manual", "source_ref": "examples/minimal-agent"}
+}

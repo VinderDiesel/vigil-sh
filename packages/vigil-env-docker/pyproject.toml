@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vigil-env-docker"
+version = "0.1.0"
+description = "Vigil environment plugin: run cases in an isolated container"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Vigil Contributors" }]
+# No Python SDK: we shell out to the `docker` CLI. Requires a Docker daemon.
+dependencies = ["vigil>=0.1.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+# Tier: maintained. Separate distribution because it needs an external
+# daemon -- core must stay installable and runnable without one (HARD-1).
+[project.entry-points."vigil.environments"]
+docker = "vigil_env_docker:DockerEnvironment"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires a running Docker daemon"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+# EXE002: the sandbox filesystem keeps files mode 777; a shebang on a package
+# __init__ would be worse than the warning.
+ignore = ["EXE002"]

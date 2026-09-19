@@ -1,0 +1,67 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+
+      - name: lint
+        run: ruff check . && ruff format --check .
+
+      - name: typecheck
+        run: mypy
+
+      - name: unit tests
+        run: pytest tests
+
+      - name: plugin conformance
+        run: pytest conformance -m conformance
+
+      - name: install out-of-tree packages
+        run: |
+          pip install -e "packages/vigil-collector-langfuse[api]"
+          pip install -e "packages/vigil-env-docker"
+
+      - name: external package tests
+        run: |
+          pytest packages/vigil-collector-langfuse
+          pytest packages/vigil-env-docker
+
+      - name: plugin conformance (with external plugins)
+        run: pytest conformance -m conformance
+
+      - name: end-to-end demo
+        run: |
+          vigil plugins
+          vigil collect examples/minimal-agent/trace.jsonl --out /tmp/collected.json
+          vigil collect examples/otel-export/trace.otlp.json --collector otel --out /tmp/otel.json
+          vigil collect packages/vigil-collector-langfuse/examples/export.json \
+                  --collector langfuse --out /tmp/langfuse.json
+          vigil run --cases examples/minimal-agent/cases \
+                    --agent examples/minimal-agent/agent.py \
+                    --junit /tmp/vigil-junit.xml --json /tmp/vigil-report.json
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vigil-report-py${{ matrix.python-version }}
+          path: /tmp/vigil-junit.xml

@@ -1,0 +1,19 @@
+{
+  "case_id": "case:docker-demo",
+  "spec_version": "v1alpha1",
+  "title": "refund policy answered inside a container",
+  "input": {"question": "refund-policy"},
+  "oracle": {"contains": ["14 days"]},
+  "oracle_version": "v1",
+  "replay_mode": "sandbox-execute",
+  "severity": "high",
+  "confidence": 1.0,
+  "provenance": {"collector": "manual", "source_ref": "examples/docker"},
+  "env": {
+    "image": "python:3.11-slim",
+    "network_policy": "none",
+    "side_effect_policy": "dry-run",
+    "clock_policy": "frozen",
+    "timeout_s": 120
+  }
+}

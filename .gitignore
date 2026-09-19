@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+.env
+.DS_Store
+# 评测产物：默认不入库（含潜在敏感数据，HARD-9）
+*-junit.xml
+vigil-report.json
+collected.json
+pr-comment.md

@@ -1,0 +1,18 @@
+{
+  "case_id": "case:refund-policy",
+  "spec_version": "v1alpha1",
+  "title": "customer asks for the refund window",
+  "input": {"question": "refund-policy"},
+  "oracle": {"contains": ["14 days"], "not_contains": ["I think"]},
+  "oracle_version": "v1",
+  "replay_mode": "mock-replay",
+  "severity": "high",
+  "labels": ["domain:support"],
+  "confidence": 1.0,
+  "provenance": {
+    "collector": "manual",
+    "source_ref": "examples/minimal-agent",
+    "reviewed_by": "maintainer"
+  },
+  "env": {"side_effect_policy": "dry-run", "network_policy": "none"}
+}

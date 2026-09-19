@@ -1,0 +1,59 @@
+{
+  "data": {
+    "observations": [
+      {
+        "id": "obs-1",
+        "traceId": "trace-abc",
+        "parentObservationId": null,
+        "type": "AGENT",
+        "name": "support-agent",
+        "startTime": "2026-09-01T10:00:00.000Z",
+        "endTime": "2026-09-01T10:00:04.000Z",
+        "level": "DEFAULT",
+        "input": {"question": "can I get a refund?"},
+        "output": {"answer": "yes, within 14 days"}
+      },
+      {
+        "id": "obs-2",
+        "traceId": "trace-abc",
+        "parentObservationId": "obs-1",
+        "type": "GENERATION",
+        "name": "chat gpt-4o-mini",
+        "model": "gpt-4o-mini",
+        "startTime": "2026-09-01T10:00:01.000Z",
+        "endTime": "2026-09-01T10:00:02.500Z",
+        "level": "DEFAULT",
+        "usage": {"promptTokens": 128, "completionTokens": 32},
+        "input": [{"role": "user", "content": "refund policy?"}],
+        "output": "Refunds are allowed within 14 days with the original receipt."
+      },
+      {
+        "id": "obs-3",
+        "traceId": "trace-abc",
+        "parentObservationId": "obs-1",
+        "type": "TOOL",
+        "name": "search_kb",
+        "tool": "search_kb",
+        "startTime": "2026-09-01T10:00:02.600Z",
+        "endTime": "2026-09-01T10:00:03.000Z",
+        "level": "DEFAULT",
+        "input": {"q": "refund"},
+        "output": {"hits": 3}
+      },
+      {
+        "id": "obs-4",
+        "traceId": "trace-abc",
+        "parentObservationId": "obs-1",
+        "type": "TOOL",
+        "name": "issue_refund",
+        "tool": "issue_refund",
+        "startTime": "2026-09-01T10:00:03.100Z",
+        "endTime": "2026-09-01T10:00:03.900Z",
+        "level": "ERROR",
+        "statusMessage": "refund over policy limit",
+        "input": {"amount": 120},
+        "output": null
+      }
+    ]
+  }
+}
