@@ -2,7 +2,7 @@
 
 这里的每个包都是**独立发行包**，不在 `vigil` 核心里。原因只有两条（AGENTS.md HARD-1 / HARD-4）：
 
-1. 核心必须零第三方依赖，`pip install vigil` 就能跑；
+1. 核心必须零第三方依赖，`pip install vigil-sh` 就能跑；
 2. 重型 SDK（`httpx`、`docker`…）永远不进核心，且**不在模块顶层 import**。
 
 | 包 | 插件类别 | 注册名 | Tier | 外部依赖 |
@@ -13,7 +13,7 @@
 安装：
 
 ```bash
-pip install vigil                        # 核心：file / otel 采集器、noop 环境
+pip install vigil-sh                       # 核心：file / otel 采集器、noop 环境
 pip install vigil-collector-langfuse     # + langfuse 采集
 pip install vigil-env-docker             # + 容器环境
 vigil plugins                            # 已注册插件一览

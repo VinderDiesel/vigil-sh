@@ -24,9 +24,19 @@
 - RFC 0003（外部包布局 / 环境能力契约 / 跨边界 Agent）、`spec/v1alpha1/environment.md`。
 
 ### 变更
+- **发行包改名 `vigil` → `vigil-sh`**（PyPI 上 `vigil` 名字已被占用）。Python import 名与 CLI 命令名
+  保持 `vigil` 不变；外部插件包名（`vigil-collector-*` / `vigil-env-*`）不受影响。
 - 环境插件必须声明 `capabilities`（HARD-13）；`noop` 改为能力驱动拒绝。
 - `clock_policy=frozen` 从"必需能力"降级为建议性告警（几乎没有沙箱能真正冻结时钟）。
 - runner 支持 `--agent` 传文件路径（远程环境需要）。
+
+### 修复
+- `pass_at_k` 此前只统计"多次运行结果有分歧"的用例，稳定通过的用例被计为 0（`repeats=1` 时恒为 0）。
+  现定义为"前 k 次运行中至少一次 PASS 的用例占比"（k = 1..最大重复次数），定义同步至 `spec/v1alpha1/gate.md`。
+- `expires_at` 此前仅空字符串被视为过期，真实日期不生效，且过期只产生 warning、结果仍可门禁。
+  现按 ISO 8601 日期与当天比较（当日仍有效），无法解析的取值一律按过期处理（保守降级）；
+  过期用例结果强制 `UNDETERMINED`，但 `policy_violation` 等安全信号不受影响（HARD-7）。
+  字段语义同步至 `spec/v1alpha1/manifest.md`。
 
 ## [0.1.0] - 2026-09-19 (alpha)
 

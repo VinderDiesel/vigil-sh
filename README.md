@@ -65,7 +65,8 @@ Vigil 不是追踪平台，不是基准榜单，也不是又一个 LLM 评测框
 ## 四、快速开始（约 5 分钟，无需 Docker / 云 / 模型 Key）
 
 ```bash
-pip install -e ".[dev]"
+pip install vigil-sh           # 发行版（PyPI 上 `vigil` 名字已被占用，故发行名为 `vigil-sh`）
+pip install -e ".[dev]"        # 源码安装（本仓库开发用）
 
 # 可选：独立发行包（见 packages/）
 pip install -e "packages/vigil-collector-langfuse"   # langfuse 采集

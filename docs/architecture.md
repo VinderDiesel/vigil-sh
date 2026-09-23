@@ -57,7 +57,7 @@ Vigil 不争夺基础设施层（OTel collector、trace store、沙箱）与集�
 | `langfuse` 采集 | `packages/vigil-collector-langfuse` | httpx（可选，函数内导入，仅 API 模式） |
 | `docker` 环境 | `packages/vigil-env-docker` | Docker daemon（shell 调 CLI） |
 
-判定标准只有一条：**核心必须 `pip install vigil` 即可运行**。任何 SDK 或 daemon 需求都进外部包。
+判定标准只有一条：**核心必须 `pip install vigil-sh` 即可运行**。任何 SDK 或 daemon 需求都进外部包。
 
 ## 3.2 环境能力契约
 

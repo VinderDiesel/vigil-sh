@@ -49,7 +49,7 @@ vigil/
 ```
 
 **核心 vs 外部包的判定**：需要 `httpx` / `docker` / `k8s` / 任何 SDK 或外部 daemon 的插件，
-一律放 `packages/` 下的独立发行包，核心保持 `pip install vigil` 即可跑。
+一律放 `packages/` 下的独立发行包，核心保持 `pip install vigil-sh` 即可跑。
 
 **依赖方向（单向，不得逆行）**：
 
