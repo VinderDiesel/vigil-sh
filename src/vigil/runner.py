@@ -75,8 +75,6 @@ def run_case(
     warnings: list[str] = []
     agent = resolve_agent(agent)
 
-    if case.expired:
-        warnings.append("case is expired; result is informational only")
     if case.replay_mode == "record-only":
         warnings.append("replay_mode=record-only: no rerun guarantee is claimed")
     if not case.env.image and case.replay_mode in ("snapshot-replay", "sandbox-execute"):
@@ -153,6 +151,12 @@ def run_case(
         # An unverified environment cannot support a PASS claim.
         result.outcome = "UNDETERMINED"
         warnings.append("outcome forced to UNDETERMINED: environment not verified")
+    elif case.expired:
+        # Expired cases cannot gate (spec/v1alpha1/manifest.md). The ERROR
+        # path above still wins, and policy_violation flags on the result are
+        # untouched: expiry must never hide a safety signal (HARD-7).
+        result.outcome = "UNDETERMINED"
+        warnings.append("outcome forced to UNDETERMINED: case expired, cannot gate")
     else:
         result.outcome = result.combine_outcome()
 
@@ -209,17 +213,22 @@ def aggregate(reports: Sequence[RunReport]) -> Aggregate:
     flaky = sum(
         1 for runs in by_case.values() if len(runs) > 1 and len({x.outcome for x in runs}) > 1
     )
-    any_pass = sum(
-        1
-        for runs in by_case.values()
-        if any(x.outcome == "PASS" for x in runs) and len({x.outcome for x in runs}) > 1
-    )
     case_count = len(by_case) or 1
+    max_runs = max((len(runs) for runs in by_case.values()), default=0)
+    # pass_at_k[k]: share of cases with at least one PASS among their first k runs.
+    pass_at_k = {
+        k: round(
+            sum(1 for runs in by_case.values() if any(r.outcome == "PASS" for r in runs[:k]))
+            / case_count,
+            6,
+        )
+        for k in range(1, max_runs + 1)
+    }
 
     return Aggregate(
         n=n,
         pass_rate=round(passed / n, 6),
-        pass_at_k={1: round(any_pass / case_count, 6)},
+        pass_at_k=pass_at_k,
         p50_latency_ms=int(_percentile([r.latency_ms for r in results], 50)),
         p95_latency_ms=int(_percentile([r.latency_ms for r in results], 95)),
         p95_cost_usd=round(_percentile([r.cost_usd for r in results], 95), 6),

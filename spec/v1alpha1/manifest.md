@@ -21,7 +21,7 @@
 | `severity` | `critical/high/medium/low/unknown` |
 | `labels` | 业务域、安全标签等 |
 | `confidence` | oracle 正确的置信度；低置信度用例不阻断构建 |
-| `expires_at` | 过期用例不得参与门禁（用例会腐化） |
+| `expires_at` | 过期用例不得参与门禁（用例会腐化）。取值为 ISO 8601 日期（`YYYY-MM-DD`）；**解析失败或为空的取值一律视为"已过期"**（保守降级，同 HARD-6） |
 | `raw_hash` / `canonical_hash` / `cluster_id` | 见 event.md 三层标识 |
 
 ## 3. EnvironmentContract

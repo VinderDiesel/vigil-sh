@@ -15,6 +15,7 @@ Never deduplicate on cluster_id. Never treat equal canonical_hash as
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from typing import Any, Literal
 
 ReplayMode = Literal[
@@ -187,6 +188,19 @@ class CaseManifest:
 
     @property
     def expired(self) -> bool:
-        # Minimal v1alpha1 semantics: explicit expiry only. Time-based
-        # evaluation requires a clock policy we deliberately do not own yet.
-        return self.expires_at is not None and self.expires_at == ""
+        """`expires_at` is an ISO date (YYYY-MM-DD); the case is valid through
+        that day and expired the day after.
+
+        An unparseable value cannot prove the case is still fresh, so it is
+        treated as expired. Degrading toward "cannot gate" is the only safe
+        reading (same posture as HARD-6).
+        """
+        if self.expires_at is None:
+            return False
+        try:
+            # 3.11+ fromisoformat also accepts datetimes; compare dates only.
+            parsed = date.fromisoformat(self.expires_at)
+        except ValueError:
+            return True
+        expiry = parsed.date() if isinstance(parsed, datetime) else parsed
+        return date.today() > expiry

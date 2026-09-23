@@ -29,6 +29,8 @@ v1alpha1 只提供 HARD；软阈值违规只产生 `warn`，退出码仍为 0。
 
 `n`、`pass_rate`、`pass_at_k`、`p50/p95_latency_ms`、`p95_cost_usd`、`intervention_rate`、`unrecoverable_rate`、`policy_violations`、`flake_rate`、`needs_review_rate`。
 
+`pass_at_k[k]` = 在前 k 次运行中至少一次 `PASS` 的用例占比（k 取 1..最大重复次数）。过期的用例被强制为 `UNDETERMINED`，永远不会计入 `PASS`。
+
 `flake_rate` 需 `repeats > 1` 才有意义：**不重复运行的可靠性指标是自欺欺人**。
 
 ## 5. 产物

@@ -64,6 +64,48 @@ def test_aggregate_counts_flake():
     assert agg.flake_rate == 1.0
 
 
+def test_pass_at_k_counts_cases_that_ever_pass():
+    # regression: a case that passes every repeat must have pass@k == 1.0.
+    # It used to be scored 0.0 unless the repeats disagreed.
+    _, agg = run_suite([make_case()], agent("ok"), repeats=3)
+    assert agg.pass_at_k == {1: 1.0, 2: 1.0, 3: 1.0}
+
+
+def test_pass_at_k_with_single_repeat_matches_pass_rate():
+    cases = [make_case(), make_case(case_id="bad", oracle={"exact": "different"})]
+    _, agg = run_suite(cases, agent("ok"), repeats=1)
+    assert agg.pass_at_k == {1: 0.5}
+
+
+def test_flaky_case_lifts_pass_at_k_above_pass_at_1():
+    calls = {"n": 0}
+
+    def flaky(case):
+        calls["n"] += 1
+        # fails the first run, passes later
+        output = "ok" if calls["n"] > 1 else "bad"
+        return RunResult(case_id=case.case_id, artifacts={"output": output})
+
+    _, agg = run_suite([make_case()], flaky, repeats=3)
+    assert agg.pass_at_k[1] == 0.0
+    assert agg.pass_at_k[3] == 1.0
+
+
+def test_expired_case_cannot_gate():
+    case = make_case()
+    case.expires_at = "2000-01-01"
+    report = run_case(case, agent("ok"))
+    assert report.result.outcome == "UNDETERMINED"
+    assert any("expired" in w for w in report.warnings)
+
+
+def test_unexpired_case_still_passes():
+    case = make_case()
+    case.expires_at = "2099-01-01"
+    report = run_case(case, agent("ok"))
+    assert report.result.outcome == "PASS"
+
+
 def test_hard_slo_blocks():
     agg = aggregate([])
     slos = [SLO(metric="policy_violations", op="max", value=0, hard=True)]
