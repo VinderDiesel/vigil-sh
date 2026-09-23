@@ -21,6 +21,7 @@
 - **`vigil.conformance`**：合规断言从测试文件提升为公共 API，外部包可直接复用
   （`assert_collector_contract` / `assert_environment_contract` / `check_plugin` …）。
 - 最小化：`token` 计数类字段不再被误判为 secret（`NOT_SECRET_PATTERN`）。
+- 文档双语化：默认 `README.md` 改为英文版，中文版移至 `README_zh.md`，顶部互设语言跳转。
 - RFC 0003（外部包布局 / 环境能力契约 / 跨边界 Agent）、`spec/v1alpha1/environment.md`。
 
 ### 变更
