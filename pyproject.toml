@@ -32,7 +32,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/VinderDiesel/vigil-sh"
-Documentation = "https://github.com/VinderDiesel/vigil-sh/tree/main/docs"
+Documentation = "https://vinderdiesel.github.io/vigil-sh/"
 Repository = "https://github.com/VinderDiesel/vigil-sh"
 Changelog = "https://github.com/VinderDiesel/vigil-sh/blob/main/CHANGELOG.md"
 Issues = "https://github.com/VinderDiesel/vigil-sh/issues"

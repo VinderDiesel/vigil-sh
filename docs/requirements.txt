@@ -1,0 +1,3 @@
+# 文档站构建依赖（仅 GitHub Pages 使用，不进 vigil 包依赖）
+mkdocs>=1.6
+mkdocs-material>=9.5
