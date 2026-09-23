@@ -1,77 +1,91 @@
-# Agent 可靠性手册（草稿）
+---
+translation: handbook
+---
 
-> 目标读者：要把 Agent 接进生产的团队。本文是方法论，不是产品文档。v0.1 阶段为草稿，欢迎通过 issue 纠错。
+# Agent Reliability Handbook (draft)
 
-## 1. 为什么"成功率"不够
+> Intended readers: teams wiring agents into production. This is methodology, not
+> product documentation. Draft at v0.1 — corrections via issues are welcome.
 
-Agent 行为是随机的：模型版本、检索语料、工具 schema、外部 API 都会漂移。单次 0/1 评分遇到以下问题全部失效：
+## 1. Why "success rate" is not enough
 
-- 同一个用例跑三次，两次过一次挂
-- pass_rate 从 0.92 掉到 0.915，是回归还是噪声？
-- 平均延迟正常，但 P95 翻了三倍
-- 成功率上升，同时人工介入率也上升（Agent 学会了"不会就交给人类"）
+Agent behavior is stochastic: model versions, retrieval corpora, tool schemas and
+external APIs all drift. A single 0/1 score breaks down on every one of these:
 
-**要签的是 SLA，不是分数。** 建议至少跟踪：
+- the same case run three times: two passes, one failure
+- pass_rate moved 0.92 → 0.915 — regression or noise?
+- mean latency looks fine while P95 tripled
+- success rate climbs while the human-intervention rate climbs too (the agent learned
+  "when lost, escalate to a human")
 
-| 指标 | 为什么 |
+**You are signing an SLA, not a score.** Track at minimum:
+
+| Metric | Why |
 |---|---|
-| `pass@k` | 多次尝试下的成功率，比单次更接近真实体验 |
-| `p95_latency` | 用户感受的是尾部，不是均值 |
-| `p95_cost` | 成本失控通常发生在长尾 |
-| `intervention_rate` | 人工介入率上升常常伪装成"成功率上升" |
-| `unrecoverable_rate` | 重试也救不回来的错误，是 SLA 的真正敌人 |
-| `flake_rate` | 同一用例多次运行结论不一致的比例 |
-| 长程衰减 | 每增加 N 步，成功率掉多少（长任务是 Agent 的软肋） |
+| `pass@k` | success over k attempts is closer to real experience than a single run |
+| `p95_latency` | users feel the tail, not the mean |
+| `p95_cost` | cost blowouts live in the long tail |
+| `intervention_rate` | rising human intervention often masquerades as "rising success rate" |
+| `unrecoverable_rate` | errors retries cannot fix are the true enemy of the SLA |
+| `flake_rate` | share of cases whose verdict changes across repeats |
+| long-horizon decay | how much success drops per N extra steps (long tasks are agents' soft spot) |
 
-## 2. 五种"重放"与其诚实边界
+## 2. Five layers of "replay" and their honest boundaries
 
-不要问"能不能重放"，要问"重放到哪一层"。
+Do not ask "can it be replayed"; ask "replayed down to which layer".
 
-| 层 | 能否固定 | 典型手段 |
+| Layer | Pinnable? | Typical means |
 |---|:--:|---|
-| 模型与采样参数 | ✅ | 锁定版本 + temperature + seed |
-| 输入与初始状态 | ✅ | 快照 |
-| 工具协议与返回 | ✅（若协议可固定） | MCP proxy 录制回放 |
-| 外部世界、时间、随机性 | ⚠️ 部分 | 时钟冻结、mock、allowlist |
-| oracle 自身 | ⚠️ 易被忽略 | oracle 版本化 + 人工评审 |
+| model + sampling params | ✅ | pin version + temperature + seed |
+| input and initial state | ✅ | snapshot |
+| tool protocols and responses | ✅ (if the protocol can be pinned) | MCP proxy record/replay |
+| external world, time, randomness | ⚠️ partially | clock freezing, mocks, allowlists |
+| the oracle itself | ⚠️ easily forgotten | oracle versioning + human review |
 
-对不可逆副作用（付款、删除、发信、撤权）**不要追求重放**，追求"默认 dry-run + 显式授权 + 完整审计"。
+For irreversible side effects (payments, deletions, sent mail, revoked permissions),
+**do not chase replay**; chase "dry-run by default + explicit authorization + full audit".
 
-## 3. 从生产 trace 到回归用例
+## 3. From production traces to regression cases
 
-1. **选择**：优先失败、人工接管、不可逆副作用、成本/步数超阈值、采集缺口。
-2. **最小化**：PII 脱敏、secret 打码、字段白名单、留痕。
-3. **审慎去重**：只在同一规范化哈希层去重；语义聚类结果**仅供人工复核参考**，不要自动删除。
-4. **oracle 人工确认**：自动生成的 oracle 会把今天的错误固化成明天的标准。
-5. **版本化与过期**：oracle 变了就升版本；用例设 `expires_at`。
-6. **进入 CI**：用 JUnit/SARIF，让失败出现在 PR 里，而不是在季度复盘里。
+1. **Select**: failures, human takeovers, irreversible side effects, cost/step
+   threshold breaches, collection gaps.
+2. **Minimize**: PII masking, secret redaction, field allowlists, keep a record.
+3. **Deduplicate carefully**: dedupe only at the canonical-hash layer; semantic
+   clustering results are **advisory for human review only** — never auto-delete.
+4. **Human-confirmed oracles**: an auto-generated oracle freezes today's mistake as
+   tomorrow's standard.
+5. **Version and expire**: bump the oracle version when it changes; give cases an `expires_at`.
+6. **Into CI**: JUnit/SARIF, so failures show up in pull requests, not quarterly retros.
 
-## 4. Judge 不是 oracle
+## 4. A judge is not an oracle
 
-- 能用确定性 scorer 就别用 LLM judge。
-- 每个 judge 必须声明版本；LLM judge 还要记录 prompt 摘要，用于检测漂移。
-- 允许弃权，记录分歧度；分歧大的用例自动送人工队列。
-- 定期跑 meta-eval：与人工标注的一致性、自洽性、版本间漂移、长度/格式偏见。
-- **标注集必须独立于日常生产数据**，否则等于用同一个模型循环验证自己。
+- Prefer a deterministic scorer whenever one exists.
+- Every judge must declare its version; LLM judges must also record a prompt digest so drift is detectable.
+- Allow abstention; record disagreement; cases with large spread go to the human queue automatically.
+- Run meta-eval periodically: agreement with human labels, self-consistency, cross-version drift, length/format bias.
+- **The labeling set must be independent of routine production data**, otherwise you are validating a model against itself in a loop.
 
-## 5. 门禁的两种错误
+## 5. The two gate errors
 
-| | 阻断（false gate） | 放行（missed regression） |
+| | blocking (false gate) | passing a regression (missed) |
 |---|---|---|
-| 成本 | 开发被打断，团队开始忽视门禁 | 问题进生产 |
-| 控制手段 | 声明最小可检测效应、重复运行、flake 分类 | 硬安全阈值、基线对照 |
+| Cost | work interrupted; the team starts ignoring the gate | problems reach production |
+| Control | declared minimum detectable effect, repeats, flake triage | hard safety thresholds, baseline comparison |
 
-**硬门禁（安全/PII/策略/不可逆副作用）永不豁免**；软阈值在声明 MDE 之前不应阻断，只告警。
+**Hard gates (safety / PII / policy / irreversible side effects) are never waived**;
+soft thresholds should warn, not block, until an MDE has been declared.
 
-## 6. 误报是最大的敌人
+## 6. False alarms are the biggest enemy
 
-`oracle_ambiguous` 必须是一等分类。统计"用例本身错了"的比例——这个数字高于 5% 时，团队对评测系统的信任会迅速崩塌，随后所有门禁都会被绕过。
+`oracle_ambiguous` must be a first-class category. Track the share of "the case itself
+was wrong" — once it exceeds 5%, trust in the evaluation system collapses quickly, and
+every gate after that gets bypassed.
 
-## 7. 落地顺序建议
+## 7. Suggested rollout order
 
-1. 先把一次真实生产失败变成能重跑的用例（哪怕手工）。
-2. 接进 CI，只开硬门禁。
-3. 统计 flake，重复运行取三次。
-4. 补确定性 scorer，再谈 LLM judge。
-5. 有了 50 条人工标注，再谈 meta-eval 与自动归因。
-6. 有了稳定的内部签名库，再谈跨组织共享。
+1. Turn one real production failure into a rerunnable case (even by hand).
+2. Wire it into CI with hard gates only.
+3. Measure flakes; run everything three times.
+4. Add deterministic scorers before talking about LLM judges.
+5. After 50 human-labeled examples, talk about meta-eval and automatic attribution.
+6. After a stable internal signature library, talk about cross-org sharing.

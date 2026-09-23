@@ -22,6 +22,8 @@
   （`assert_collector_contract` / `assert_environment_contract` / `check_plugin` …）。
 - 最小化：`token` 计数类字段不再被误判为 secret（`NOT_SECRET_PATTERN`）。
 - 文档双语化：默认 `README.md` 改为英文版，中文版移至 `README_zh.md`，顶部互设语言跳转。
+- 文档站双语：mkdocs 站点英文为默认（站点根路径），中文移入 `/zh/`，头部语言下拉切换；
+  无第三方 i18n 插件依赖（Community 版 material 不含该插件，采用双导航树方案）。
 - RFC 0003（外部包布局 / 环境能力契约 / 跨边界 Agent）、`spec/v1alpha1/environment.md`。
 
 ### 变更

@@ -1,39 +1,48 @@
-# Vigil（衡鉴）
+---
+translation: home
+---
 
-**把 Agent 的一次执行，变成可重放、可评分、可进 CI 门禁的可靠性资产。**
+# Vigil
 
-Vigil 不是追踪平台，不是基准榜单，也不是又一个 LLM 评测框架。它是连接"生产证据"和
-"工程门禁"的那一层：吃现有可观测平台的导出，产出版本化的回归用例，用受控环境重放，
-用多评分器判定，最后在 CI 里给出可执行的放行/阻断决策。
+**Turn one agent execution into a replayable, scoreable, gateable reliability asset.**
 
-!!! warning "状态"
-    v0.1.0-alpha，规范版本 `v1alpha1`。协议未冻结，勿用于关键生产决策。
+Vigil is not a tracing platform, not a benchmark leaderboard, and not yet another LLM
+evaluation framework. It is the layer that connects production evidence to engineering
+gates: it consumes exports from existing observability platforms, produces versioned
+regression cases, replays them in controlled environments, judges them with multiple
+scorers, and finally emits an actionable allow/block decision for CI.
 
-## 核心链路
+!!! warning "Status"
+    v0.1.0-alpha, spec version `v1alpha1`. The protocol is not frozen — do not use it
+    for critical production decisions yet.
+
+## The core chain
 
 ```
   Execution          CanonicalEvent         CaseManifest          Score            GateArtifact
- (任意来源)    →    (规范化+脱敏)     →    (版本化契约)    →   (评分+弃权)   →   (JUnit/JSON)
+ (any source)  →   (canonicalized +     →  (versioned      →   (scored +     →   (JUnit/JSON)
+                    redacted)                 contract)          abstention)
        ▲                                        │
        └────────────  replay ────────────────────┘
 ```
 
-## 文档
+## Documentation
 
-- [架构](architecture.md) — 分层、依赖方向、插件体系的设计理由
-- [可靠性手册](reliability-handbook.md) — 方法论：弃权、分歧、重放模式与措辞纪律
-- [路线图](roadmap.md) — 决策门 G1–G4 与范围收缩条件
+- [Architecture](architecture.md) — layering, dependency direction, and the reasoning behind the plugin design
+- [Reliability handbook](reliability-handbook.md) — methodology: abstention, disagreement, replay modes and vocabulary discipline
+- [Roadmap](roadmap.md) — decision gates G1–G4 and scope-shrink conditions
 
-工程协议（给贡献者与编码 Agent）见仓库根目录
-[AGENTS.md](https://github.com/VinderDiesel/vigil-sh/blob/main/AGENTS.md)，
-规范文本见 [spec/v1alpha1](https://github.com/VinderDiesel/vigil-sh/tree/main/spec/v1alpha1)。
+The engineering protocol (for contributors and coding agents) lives in
+[AGENTS.md](https://github.com/VinderDiesel/vigil-sh/blob/main/AGENTS.md); the normative
+text lives in [spec/v1alpha1](https://github.com/VinderDiesel/vigil-sh/tree/main/spec/v1alpha1).
 
-## 快速开始
+## Quickstart
 
 ```bash
-pip install vigil-sh           # 发行版
-vigil plugins                  # 查看已注册插件
+pip install vigil-sh           # the distribution
+vigil plugins                  # list registered plugins
 ```
 
-端到端样例（采集 → 造用例 → 跑套件 → 门禁，约 5 分钟，无需 Docker / 云 / 模型 Key）
-见仓库 [`examples/minimal-agent/`](https://github.com/VinderDiesel/vigil-sh/tree/main/examples/minimal-agent)。
+The end-to-end demo (collect → mint → run → gate, ~5 minutes, no Docker / cloud /
+model keys needed) lives in
+[`examples/minimal-agent/`](https://github.com/VinderDiesel/vigil-sh/tree/main/examples/minimal-agent).

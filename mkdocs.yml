@@ -1,5 +1,5 @@
-site_name: Vigil（衡鉴）
-site_description: 把 Agent 的一次执行，变成可重放、可评分、可进 CI 门禁的可靠性资产
+site_name: Vigil
+site_description: Turn one agent execution into a replayable, scoreable, gateable reliability asset
 site_url: https://vinderdiesel.github.io/vigil-sh/
 repo_url: https://github.com/VinderDiesel/vigil-sh
 repo_name: VinderDiesel/vigil-sh
@@ -8,7 +8,7 @@ docs_dir: docs
 
 theme:
   name: material
-  language: zh
+  language: en
   features:
     - navigation.sections
     - navigation.top
@@ -18,12 +18,21 @@ theme:
       primary: slate
       toggle:
         icon: material/brightness-7
-        name: 切换暗色
+        name: Switch to dark mode
     - scheme: slate
       primary: slate
       toggle:
         icon: material/brightness-4
-        name: 切换亮色
+        name: Switch to light mode
+
+extra:
+  alternate:
+    - name: English
+      link: /vigil-sh/
+      lang: en
+    - name: 简体中文
+      link: /vigil-sh/zh/
+      lang: zh
 
 markdown_extensions:
   - admonition
@@ -32,8 +41,15 @@ markdown_extensions:
   - toc:
       permalink: true
 
+plugins: []
+
 nav:
-  - 首页: index.md
-  - 架构: architecture.md
-  - 可靠性手册: reliability-handbook.md
-  - 路线图: roadmap.md
+  - Home: index.md
+  - Architecture: architecture.md
+  - Reliability handbook: reliability-handbook.md
+  - Roadmap: roadmap.md
+  - 简体中文:
+    - 首页: zh/index.md
+    - 架构: zh/architecture.md
+    - 可靠性手册: zh/reliability-handbook.md
+    - 路线图: zh/roadmap.md
